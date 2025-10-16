@@ -1,0 +1,118 @@
+@base = http://localhost:4111
+@admin_auth = Basic YWRtaW46YWRtaW4=
+@user1_auth = Basic dXNlckFtdG9uaW5hOm15U2VjcmV0Nzc3IQ==
+@user2_auth = Basic dXNlclV0dGk6bXlTZWNyZXQ3NzchMg==
+@A1 = 1
+@A2 = 2
+
+
+### 0.1. Создать пользователя user1
+POST {{base}}/api/v1/admin/users
+Authorization: {{admin_auth}}
+Content-Type: application/json
+
+{
+  "username": "userAmtonina",
+  "password": "mySecret777!",
+  "role": "USER"
+}
+
+
+### 0.1. Создать пользователя user2
+POST {{base}}/api/v1/admin/users
+Authorization: {{admin_auth}}
+Content-Type: application/json
+
+{
+  "username": "userUtti",
+  "password": "mySecret777!2",
+  "role": "USER"
+}
+
+### 1.1. user1 создаёт свой аккаунт
+POST {{base}}/api/v1/accounts
+Authorization: {{user1_auth}}
+Content-Type: application/json
+
+{}
+### {"id": 1,"accountNumber": "ACC1","balance": 0.0,"transactions": []}
+
+
+### 1.2. user2 создаёт свой аккаунт
+POST {{base}}/api/v1/accounts
+Authorization: {{user2_auth}}
+Content-Type: application/json
+
+{}
+### {"id": 2,"accountNumber": "ACC2","balance": 0.0,"transactions": []}
+
+
+### 2-позитив. Депозит (user1 кладёт на свой счёт)
+POST {{base}}/api/v1/accounts/deposit
+Authorization: {{user1_auth}}
+Content-Type: application/json
+
+{
+  "id": {{A1}},
+  "balance": 1000
+}
+
+### 2-негатив: user1 кладет на счет user2
+POST {{base}}/api/v1/accounts/deposit
+Authorization: {{user1_auth}}
+Content-Type: application/json
+
+{
+  "id": {{A2}},
+  "balance": 100
+}
+### 403 error
+
+
+### 3-позитив. Перевод user1 -> user2
+POST {{base}}/api/v1/accounts/transfer
+Authorization: {{user1_auth}}
+Content-Type: application/json
+
+{
+  "senderAccountId": {{A1}},
+  "receiverAccountId": {{A2}},
+  "amount": 500
+}
+
+
+### 3-негатив: недостаточно средств
+POST {{base}}/api/v1/accounts/transfer
+Authorization: {{user1_auth}}
+Content-Type: application/json
+
+{
+  "senderAccountId": {{A1}},
+  "receiverAccountId": {{A2}},
+  "amount": 10000
+}
+### Invalid transfer: insufficient funds or invalid accounts
+
+
+### 4.1. Смена имени пользователя
+PUT {{base}}/api/v1/customer/profile
+Authorization: {{user1_auth}}
+Content-Type: application/json
+
+{
+  "name": "Antonina New"
+}
+
+
+### 4.2. смена имени на некорректное
+PUT {{base}}/api/v1/customer/profile
+Authorization: {{user1_auth}}
+Content-Type: application/json
+
+{
+  "name": "Antonina"
+}
+###400 Name must contain two words with letters only
+
+
+

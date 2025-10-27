@@ -1,3 +1,4 @@
+###first steps
 @base = http://localhost:4111
 @admin_auth = Basic YWRtaW46YWRtaW4=
 @user1_auth = Basic dXNlckFtdG9uaW5hOm15U2VjcmV0Nzc3IQ==
